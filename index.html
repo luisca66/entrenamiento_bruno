@@ -378,6 +378,7 @@
             <div class="date-selector">
                 <input type="date" id="sessionDate" />
                 <button class="btn btn-primary" onclick="loadOrCreateSession()">Cargar</button>
+                <button class="btn btn-secondary" onclick="copyPreviousWorkout()">📋 Copiar Anterior</button>
             </div>
             <div class="bodyweight-input">
                 <label>Peso Corporal (kg):</label>
@@ -808,6 +809,48 @@
 
             sessions.sort((a, b) => new Date(b.date) - new Date(a.date));
             localStorage.setItem('workoutSessions', JSON.stringify(sessions));
+        }
+
+        function copyPreviousWorkout() {
+            const sessions = JSON.parse(localStorage.getItem('workoutSessions') || '[]');
+            const currentDate = new Date(document.getElementById('sessionDate').value);
+            
+            // Find the most recent session before current date
+            const previousSession = sessions
+                .filter(s => new Date(s.date) < currentDate)
+                .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+
+            if (!previousSession) {
+                alert('No hay entrenamientos anteriores para copiar.');
+                return;
+            }
+
+            // Deep copy of previous session
+            currentSession.bodyweight = previousSession.bodyweight;
+            currentSession.workoutTime = previousSession.workoutTime;
+            
+            // Copy exerciseConfigs (5RM and ROM)
+            currentSession.exerciseConfigs = JSON.parse(JSON.stringify(previousSession.exerciseConfigs || {}));
+            
+            // Copy all exercises with their sets
+            currentSession.exercises = previousSession.exercises.map(exercise => ({
+                name: exercise.name,
+                sets: exercise.sets.map(set => ({
+                    sets: set.sets,
+                    reps: set.reps,
+                    weight: set.weight
+                }))
+            }));
+
+            // Update UI
+            document.getElementById('bodyweight').value = currentSession.bodyweight;
+            document.getElementById('workoutTime').value = currentSession.workoutTime;
+            
+            renderExercises();
+            updateAllCalculations();
+            saveSession();
+
+            alert(`✅ Entrenamiento del ${new Date(previousSession.date).toLocaleDateString('es-MX')} copiado correctamente.\n\nAhora puedes ajustar los pesos que subiste.`);
         }
 
         function showSessions() {
