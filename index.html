@@ -472,7 +472,7 @@
             </div>
 
             <div class="date-selector">
-                <input type="date" id="sessionDate" />
+                <input type="date" id="sessionDate" onchange="loadOrCreateSession()" />
                 <button class="btn btn-primary" onclick="loadOrCreateSession()">Cargar</button>
                 <button class="btn btn-secondary" onclick="copyPreviousWorkout()">📋 Copiar Anterior</button>
             </div>
@@ -566,8 +566,13 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('sessionDate').value = today;
+            // FIXED: Use Local time instead of UTC to avoid "tomorrow" bug in evenings
+            const localDate = new Date();
+            const year = localDate.getFullYear();
+            const month = String(localDate.getMonth() + 1).padStart(2, '0');
+            const day = String(localDate.getDate()).padStart(2, '0');
+            document.getElementById('sessionDate').value = `${year}-${month}-${day}`;
+
             initializeExercises();
             loadOrCreateSession();
         });
@@ -621,6 +626,7 @@
                 document.getElementById('workoutTime').value = currentSession.workoutTime || 60;
             } else {
                 // Create NEW session - reset everything
+                // This logic is correct, it was just not triggering on date change before
                 currentSession = {
                     date: date,
                     bodyweight: parseFloat(document.getElementById('bodyweight').value) || 79.2,
@@ -918,44 +924,67 @@
 
         function copyPreviousWorkout() {
             const sessions = JSON.parse(localStorage.getItem('workoutSessions') || '[]');
-            const currentDate = new Date(document.getElementById('sessionDate').value);
+            const currentDateStr = document.getElementById('sessionDate').value;
+            const currentDate = new Date(currentDateStr);
             
-            // Find the most recent session before current date
-            const previousSession = sessions
+            // 1. Filtrar sesiones anteriores y ordenar
+            const pastSessions = sessions
                 .filter(s => new Date(s.date) < currentDate)
-                .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
 
-            if (!previousSession) {
-                alert('No hay entrenamientos anteriores para copiar.');
+            if (pastSessions.length === 0) {
+                alert('No hay entrenamientos anteriores para buscar.');
                 return;
             }
 
-            // Deep copy of previous session
-            currentSession.bodyweight = previousSession.bodyweight;
-            currentSession.workoutTime = previousSession.workoutTime;
-            
-            // Copy exerciseConfigs (5RM and ROM)
-            currentSession.exerciseConfigs = JSON.parse(JSON.stringify(previousSession.exerciseConfigs || {}));
-            
-            // Copy all exercises with their sets
-            currentSession.exercises = previousSession.exercises.map(exercise => ({
-                name: exercise.name,
-                sets: exercise.sets.map(set => ({
-                    sets: set.sets,
-                    reps: set.reps,
-                    weight: set.weight
-                }))
-            }));
+            let copiedCount = 0;
 
-            // Update UI
-            document.getElementById('bodyweight').value = currentSession.bodyweight;
-            document.getElementById('workoutTime').value = currentSession.workoutTime;
-            
-            renderExercises();
-            updateAllCalculations();
-            saveSession();
+            // 2. Iterar sobre CADA ejercicio actual
+            currentSession.exercises.forEach(currentExercise => {
+                // 3. Buscar la sesión más reciente DONDE este ejercicio específico tenga datos
+                const lastSessionWithData = pastSessions.find(session => {
+                    const exData = session.exercises.find(e => e.name === currentExercise.name);
+                    return exData && exData.sets && exData.sets.length > 0;
+                });
 
-            alert(`✅ Entrenamiento del ${new Date(previousSession.date).toLocaleDateString('es-MX')} copiado correctamente.\n\nAhora puedes ajustar los pesos que subiste.`);
+                if (lastSessionWithData) {
+                    const prevExerciseData = lastSessionWithData.exercises.find(e => e.name === currentExercise.name);
+                    
+                    // Copiar series (Deep copy)
+                    currentExercise.sets = prevExerciseData.sets.map(set => ({
+                        sets: set.sets,
+                        reps: set.reps,
+                        weight: set.weight
+                    }));
+
+                    // Copiar configuración (5RM y ROM) de esa sesión específica
+                    if (lastSessionWithData.exerciseConfigs && lastSessionWithData.exerciseConfigs[currentExercise.name]) {
+                        if (!currentSession.exerciseConfigs) currentSession.exerciseConfigs = {};
+                        
+                        currentSession.exerciseConfigs[currentExercise.name] = {
+                            fiveRM: lastSessionWithData.exerciseConfigs[currentExercise.name].fiveRM,
+                            rom: lastSessionWithData.exerciseConfigs[currentExercise.name].rom
+                        };
+                    }
+
+                    copiedCount++;
+                }
+            });
+
+            if (copiedCount > 0) {
+                // Copiar el peso corporal de la sesión absoluta más reciente
+                if (pastSessions[0].bodyweight) {
+                    currentSession.bodyweight = pastSessions[0].bodyweight;
+                    document.getElementById('bodyweight').value = currentSession.bodyweight;
+                }
+
+                renderExercises();
+                updateAllCalculations();
+                saveSession();
+                alert(`✅ Se copiaron datos para ${copiedCount} ejercicios desde sus últimas sesiones realizadas.`);
+            } else {
+                alert('No se encontraron registros previos con series para los ejercicios actuales.');
+            }
         }
 
         function showSessions() {
