@@ -49,6 +49,25 @@
             gap: 10px;
             align-items: center;
             margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 600px) {
+            .date-selector {
+                gap: 8px;
+            }
+            
+            .date-selector input {
+                flex: 1 1 100%;
+                min-width: 0;
+            }
+            
+            .btn {
+                flex: 1;
+                padding: 10px 16px;
+                font-size: 14px;
+                white-space: nowrap;
+            }
         }
 
         .date-selector input {
@@ -57,6 +76,21 @@
             border: 2px solid #e0e0e0;
             border-radius: 10px;
             font-size: 16px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .date-selector input[type="date"]::-webkit-calendar-picker-indicator {
+            background: transparent;
+            bottom: 0;
+            color: transparent;
+            cursor: pointer;
+            height: auto;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: auto;
         }
 
         .btn {
@@ -203,9 +237,26 @@
 
         .set-row {
             display: grid;
-            grid-template-columns: 60px 1fr 1fr 1fr 40px;
-            gap: 8px;
+            grid-template-columns: 50px 1fr 1fr 1fr 40px;
+            gap: 6px;
             align-items: center;
+        }
+
+        @media (max-width: 600px) {
+            .set-row {
+                grid-template-columns: 45px 70px 70px 70px 36px;
+                gap: 4px;
+                font-size: 14px;
+            }
+            
+            .set-input {
+                padding: 8px 4px;
+                font-size: 14px;
+            }
+            
+            .set-label {
+                font-size: 13px;
+            }
         }
 
         .set-label {
@@ -569,16 +620,25 @@
                 document.getElementById('bodyweight').value = currentSession.bodyweight;
                 document.getElementById('workoutTime').value = currentSession.workoutTime || 60;
             } else {
-                currentSession.date = date;
-                currentSession.bodyweight = parseFloat(document.getElementById('bodyweight').value) || 79.2;
-                currentSession.workoutTime = parseFloat(document.getElementById('workoutTime').value) || 60;
-                // Initialize exerciseConfigs
-                currentSession.exerciseConfigs = {};
+                // Create NEW session - reset everything
+                currentSession = {
+                    date: date,
+                    bodyweight: parseFloat(document.getElementById('bodyweight').value) || 79.2,
+                    workoutTime: parseFloat(document.getElementById('workoutTime').value) || 60,
+                    exercises: [],
+                    exerciseConfigs: {}
+                };
+                
+                // Initialize exerciseConfigs and empty exercises
                 Object.keys(EXERCISES).forEach(name => {
                     currentSession.exerciseConfigs[name] = {
                         fiveRM: EXERCISES[name].fiveRM,
                         rom: EXERCISES[name].rom
                     };
+                    currentSession.exercises.push({
+                        name: name,
+                        sets: []
+                    });
                 });
             }
 
