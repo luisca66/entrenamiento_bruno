@@ -364,6 +364,42 @@
             font-size: 16px;
         }
 
+        .footer {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 15px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer-title {
+            font-size: 14px;
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .footer-link {
+            color: #764ba2;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .footer-link:hover {
+            color: #667eea;
+            text-decoration: underline;
+        }
+
+        .footer-text {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+        }
+
         @media (max-width: 600px) {
             .stats-grid {
                 grid-template-columns: 1fr;
@@ -375,6 +411,15 @@
     <div class="container">
         <div class="header">
             <h1>🏋️ Registro de Entrenamiento</h1>
+            
+            <div class="footer">
+                <div class="footer-title">💪 Desarrollado por Luis Cárdenas</div>
+                <div class="footer-text">
+                    🎵 Storm Studios<br>
+                    <a href="https://www.stormstudios.com.mx" target="_blank" class="footer-link">www.stormstudios.com.mx</a>
+                </div>
+            </div>
+
             <div class="date-selector">
                 <input type="date" id="sessionDate" />
                 <button class="btn btn-primary" onclick="loadOrCreateSession()">Cargar</button>
