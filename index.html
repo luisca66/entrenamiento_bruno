@@ -527,33 +527,41 @@
     </div>
 
     <script>
+        // Conversion constant
+        const LBS_TO_KG = 0.453592;
+
+        // Convert weight to kg for calculations
+        function getWeightInKg(weight, unit) {
+            return unit === 'lbs' ? weight * LBS_TO_KG : weight;
+        }
+
         // Exercise database with ROM coefficients and 5RM historical values
         const EXERCISES = {
             // UPPER - Día 1
-            'Press de Banca (Barra)': { rom: 0.4, barWeight: 20, usesBodyweight: false, fiveRM: 90.0 },
-            'Remo Sentado con Cable': { rom: 0.36, barWeight: 0, usesBodyweight: false, fiveRM: 63.5 },
-            'Press de Hombros (Mancuerna)': { rom: 0.4, barWeight: 0, usesBodyweight: false, fiveRM: 25.0 },
-            'Jalón al Pecho (Cable)': { rom: 0.5, barWeight: 0, usesBodyweight: false, fiveRM: 68.0 },
-            'Preacher Curl (Barbell)': { rom: 0.3, barWeight: 7, usesBodyweight: false, fiveRM: 33.6 },
-            'Tríceps con Polea': { rom: 0.35, barWeight: 0, usesBodyweight: false, fiveRM: 68.0 },
-            
+            'Press de Banca (Barra)': { rom: 0.4, barWeight: 20, usesBodyweight: false, fiveRM: 90.0, unit: 'kg' },
+            'Remo Sentado con Cable': { rom: 0.36, barWeight: 0, usesBodyweight: false, fiveRM: 140.0, unit: 'lbs' },
+            'Press de Hombros (Mancuerna)': { rom: 0.4, barWeight: 0, usesBodyweight: false, fiveRM: 55.1, unit: 'lbs' },
+            'Jalón al Pecho (Cable)': { rom: 0.5, barWeight: 0, usesBodyweight: false, fiveRM: 149.9, unit: 'lbs' },
+            'Preacher Curl (Barbell)': { rom: 0.3, barWeight: 7, usesBodyweight: false, fiveRM: 33.6, unit: 'kg' },
+            'Tríceps con Polea': { rom: 0.35, barWeight: 0, usesBodyweight: false, fiveRM: 149.9, unit: 'lbs' },
+
             // LOWER - Día 2
-            'Sentadilla Hack (Máquina)': { rom: 0.57, barWeight: 0, usesBodyweight: false, fiveRM: 40.0 },
-            'Peso Muerto Rumano (Barra)': { rom: 0.46, barWeight: 20, usesBodyweight: false, fiveRM: 80.0 },
-            'Press de Piernas': { rom: 0.5, barWeight: 0, usesBodyweight: false, fiveRM: 200.0 },
-            'Curl de Piernas Acostado (Máquina)': { rom: 0.35, barWeight: 0, usesBodyweight: false, fiveRM: 47.6 },
-            'Elevación de Gemelos de Pie (Máquina)': { rom: 0.2, barWeight: 0, usesBodyweight: false, fiveRM: 102.0 },
-            
+            'Sentadilla Hack (Máquina)': { rom: 0.57, barWeight: 0, usesBodyweight: false, fiveRM: 40.0, unit: 'kg' },
+            'Peso Muerto Rumano (Barra)': { rom: 0.46, barWeight: 20, usesBodyweight: false, fiveRM: 80.0, unit: 'kg' },
+            'Press de Piernas': { rom: 0.5, barWeight: 0, usesBodyweight: false, fiveRM: 440.9, unit: 'lbs' },
+            'Curl de Piernas Acostado (Máquina)': { rom: 0.35, barWeight: 0, usesBodyweight: false, fiveRM: 104.9, unit: 'lbs' },
+            'Elevación de Gemelos de Pie (Máquina)': { rom: 0.2, barWeight: 0, usesBodyweight: false, fiveRM: 224.9, unit: 'lbs' },
+
             // UPPER - Día 4 (énfasis)
-            'Press de Banca Inclinado (Mancuerna)': { rom: 0.42, barWeight: 0, usesBodyweight: false, fiveRM: 77.0 },
-            'Fondo de Tríceps': { rom: 0.4, barWeight: 0, usesBodyweight: true, fiveRM: 0 },
-            'Tirón a la Cara (Face Pull)': { rom: 0.3, barWeight: 0, usesBodyweight: false, fiveRM: 56.5 },
-            'Curl de Bíceps Inclinado (Mancuerna)': { rom: 0.32, barWeight: 0, usesBodyweight: false, fiveRM: 40.8 },
-            
+            'Press de Banca Inclinado (Mancuerna)': { rom: 0.42, barWeight: 0, usesBodyweight: false, fiveRM: 169.8, unit: 'lbs' },
+            'Fondo de Tríceps': { rom: 0.4, barWeight: 0, usesBodyweight: true, fiveRM: 0, unit: 'kg' },
+            'Tirón a la Cara (Face Pull)': { rom: 0.3, barWeight: 0, usesBodyweight: false, fiveRM: 124.6, unit: 'lbs' },
+            'Curl de Bíceps Inclinado (Mancuerna)': { rom: 0.32, barWeight: 0, usesBodyweight: false, fiveRM: 89.9, unit: 'lbs' },
+
             // LOWER - Día 5 (énfasis)
-            'Peso Muerto (Barra)': { rom: 0.46, barWeight: 20, usesBodyweight: false, fiveRM: 95.0 },
-            'Extensión de Pierna': { rom: 0.4, barWeight: 0, usesBodyweight: false, fiveRM: 88.5 },
-            'Rear Kick (Machine)': { rom: 0.35, barWeight: 0, usesBodyweight: false, fiveRM: 43.0 }
+            'Peso Muerto (Barra)': { rom: 0.46, barWeight: 20, usesBodyweight: false, fiveRM: 95.0, unit: 'kg' },
+            'Extensión de Pierna': { rom: 0.4, barWeight: 0, usesBodyweight: false, fiveRM: 195.1, unit: 'lbs' },
+            'Rear Kick (Machine)': { rom: 0.35, barWeight: 0, usesBodyweight: false, fiveRM: 94.8, unit: 'lbs' }
         };
 
         let currentSession = {
@@ -578,12 +586,13 @@
         });
 
         function initializeExercises() {
-            // Initialize exercise configs with default 5RM and ROM values
+            // Initialize exercise configs with default 5RM, ROM, and unit values
             currentSession.exerciseConfigs = {};
             Object.keys(EXERCISES).forEach(exerciseName => {
                 currentSession.exerciseConfigs[exerciseName] = {
                     fiveRM: EXERCISES[exerciseName].fiveRM,
-                    rom: EXERCISES[exerciseName].rom
+                    rom: EXERCISES[exerciseName].rom,
+                    unit: EXERCISES[exerciseName].unit
                 };
                 currentSession.exercises.push({
                     name: exerciseName,
@@ -606,19 +615,26 @@
                     Object.keys(EXERCISES).forEach(name => {
                         currentSession.exerciseConfigs[name] = {
                             fiveRM: EXERCISES[name].fiveRM,
-                            rom: EXERCISES[name].rom
+                            rom: EXERCISES[name].rom,
+                            unit: EXERCISES[name].unit
                         };
                     });
                 } else {
-                    // Ensure ROM exists for each exercise (backward compatibility)
+                    // Ensure ROM and unit exist for each exercise (backward compatibility)
                     Object.keys(EXERCISES).forEach(name => {
                         if (!currentSession.exerciseConfigs[name]) {
                             currentSession.exerciseConfigs[name] = {
                                 fiveRM: EXERCISES[name].fiveRM,
-                                rom: EXERCISES[name].rom
+                                rom: EXERCISES[name].rom,
+                                unit: EXERCISES[name].unit
                             };
-                        } else if (currentSession.exerciseConfigs[name].rom === undefined) {
-                            currentSession.exerciseConfigs[name].rom = EXERCISES[name].rom;
+                        } else {
+                            if (currentSession.exerciseConfigs[name].rom === undefined) {
+                                currentSession.exerciseConfigs[name].rom = EXERCISES[name].rom;
+                            }
+                            if (currentSession.exerciseConfigs[name].unit === undefined) {
+                                currentSession.exerciseConfigs[name].unit = EXERCISES[name].unit;
+                            }
                         }
                     });
                 }
@@ -634,12 +650,13 @@
                     exercises: [],
                     exerciseConfigs: {}
                 };
-                
+
                 // Initialize exerciseConfigs and empty exercises
                 Object.keys(EXERCISES).forEach(name => {
                     currentSession.exerciseConfigs[name] = {
                         fiveRM: EXERCISES[name].fiveRM,
-                        rom: EXERCISES[name].rom
+                        rom: EXERCISES[name].rom,
+                        unit: EXERCISES[name].unit
                     };
                     currentSession.exercises.push({
                         name: name,
@@ -660,23 +677,25 @@
             currentSession.exercises.forEach((exercise, exIndex) => {
                 const card = document.createElement('div');
                 card.className = 'exercise-card';
-                
+
                 const fiveRM = currentSession.exerciseConfigs[exercise.name]?.fiveRM || EXERCISES[exercise.name].fiveRM;
                 const rom = currentSession.exerciseConfigs[exercise.name]?.rom || EXERCISES[exercise.name].rom;
-                
+                const unit = currentSession.exerciseConfigs[exercise.name]?.unit || EXERCISES[exercise.name].unit || 'kg';
+                const step = unit === 'lbs' ? '0.5' : '0.25';
+
                 let setsHTML = '';
                 exercise.sets.forEach((set, setIndex) => {
                     setsHTML += `
                         <div class="set-row">
                             <div class="set-label">Set ${setIndex + 1}</div>
-                            <input type="number" class="set-input" placeholder="Sets" 
-                                   value="${set.sets || ''}" 
+                            <input type="number" class="set-input" placeholder="Sets"
+                                   value="${set.sets || ''}"
                                    onchange="updateSet(${exIndex}, ${setIndex}, 'sets', this.value)" />
-                            <input type="number" class="set-input" placeholder="Reps" 
-                                   value="${set.reps || ''}" 
+                            <input type="number" class="set-input" placeholder="Reps"
+                                   value="${set.reps || ''}"
                                    onchange="updateSet(${exIndex}, ${setIndex}, 'reps', this.value)" />
-                            <input type="number" class="set-input" placeholder="Peso" step="0.25"
-                                   value="${set.weight || ''}" 
+                            <input type="number" class="set-input" placeholder="Peso (${unit})" step="${step}"
+                                   value="${set.weight || ''}"
                                    onchange="updateSet(${exIndex}, ${setIndex}, 'weight', this.value)" />
                             <button class="remove-set-btn" onclick="removeSet(${exIndex}, ${setIndex})">×</button>
                         </div>
@@ -684,22 +703,22 @@
                 });
 
                 const calcs = calculateExerciseStats(exercise);
-                
+
                 card.innerHTML = `
                     <div class="exercise-header">
                         <div class="exercise-title-section">
                             <div class="exercise-name">${exercise.name}</div>
                             <div class="rm-input-container">
                                 <label>5RM:</label>
-                                <input type="number" class="rm-input" step="0.25" 
-                                       value="${fiveRM}" 
+                                <input type="number" class="rm-input" step="${step}"
+                                       value="${fiveRM}"
                                        onchange="update5RM('${exercise.name}', this.value)" />
-                                <span style="color: #999; font-size: 12px;">kg</span>
+                                <span style="color: #999; font-size: 12px;">${unit}</span>
                             </div>
                             <div class="rm-input-container">
                                 <label>ROM:</label>
-                                <input type="number" class="rom-input" step="0.01" 
-                                       value="${rom}" 
+                                <input type="number" class="rom-input" step="0.01"
+                                       value="${rom}"
                                        onchange="updateROM('${exercise.name}', this.value)" />
                                 <span style="color: #999; font-size: 12px;">m</span>
                             </div>
@@ -717,7 +736,7 @@
                         <div class="calc-row"><span>Intensidad:</span><span>${calcs.intensity.toFixed(1)}%</span></div>
                     </div>
                 `;
-                
+
                 container.appendChild(card);
             });
         }
@@ -767,31 +786,43 @@
             const bodyweight = parseFloat(document.getElementById('bodyweight').value) || 79.2;
             const fiveRM = currentSession.exerciseConfigs[exercise.name]?.fiveRM || EXERCISES[exercise.name].fiveRM;
             const rom = currentSession.exerciseConfigs[exercise.name]?.rom || EXERCISES[exercise.name].rom;
-            
+            const exerciseUnit = currentSession.exerciseConfigs[exercise.name]?.unit || EXERCISES[exercise.name].unit || 'kg';
+            const barWeight = config.barWeight || 0;
+            const usesBodyweight = config.usesBodyweight || false;
+
             let volume = 0;
             let force = 0;
             let work = 0;
             let maxWeight = 0;
 
             exercise.sets.forEach(set => {
-                const effectiveWeight = config.usesBodyweight 
-                    ? (parseFloat(set.weight) || 0) + bodyweight 
-                    : (parseFloat(set.weight) || 0);
-                
-                const sets = parseFloat(set.sets) || 0;
-                const reps = parseFloat(set.reps) || 0;
+                if (set.sets && set.reps && set.weight) {
+                    // Convert weight to kg for calculations
+                    const weightInKg = getWeightInKg(set.weight, exerciseUnit);
 
-                volume += effectiveWeight * sets * reps;
-                force = effectiveWeight * 9.8;
-                work += force * rom * sets * reps;
+                    // Calculate total weight (including bodyweight or bar if applicable)
+                    const totalWeight = usesBodyweight
+                        ? (weightInKg + bodyweight)
+                        : (weightInKg + barWeight);
 
-                if (effectiveWeight > maxWeight && reps > 0) {
-                    maxWeight = effectiveWeight;
+                    const sets = parseFloat(set.sets) || 0;
+                    const reps = parseFloat(set.reps) || 0;
+
+                    volume += weightInKg * sets * reps;
+                    force += totalWeight * 9.8 * sets * reps;
+                    work += force * rom;
+
+                    if (totalWeight > maxWeight && reps > 0) {
+                        maxWeight = totalWeight;
+                    }
                 }
             });
 
+            // Convert 5RM to kg if needed for 1RM calculation
+            const fiveRMInKg = getWeightInKg(fiveRM, exerciseUnit);
+
             // Calculate 1RM from 5RM using Brzycki: 1RM = 5RM / (1.0278 - 0.0278 × 5)
-            const oneRM = fiveRM > 0 ? fiveRM / (1.0278 - 0.0278 * 5) : 0;
+            const oneRM = fiveRMInKg > 0 ? fiveRMInKg / (1.0278 - 0.0278 * 5) : 0;
 
             // Intensity based on max weight used vs calculated 1RM
             const intensity = oneRM > 0 ? (maxWeight / oneRM) * 100 : 0;
@@ -839,7 +870,7 @@
         function loadPreviousSession() {
             const sessions = JSON.parse(localStorage.getItem('workoutSessions') || '[]');
             const currentDate = new Date(currentSession.date);
-            
+
             // Find the most recent session before current date
             const previousSession = sessions
                 .filter(s => new Date(s.date) < currentDate)
@@ -857,29 +888,39 @@
                     const bodyweight = previousSession.bodyweight || 79.2;
                     const fiveRM = previousSession.exerciseConfigs?.[exercise.name]?.fiveRM || EXERCISES[exercise.name].fiveRM;
                     const rom = previousSession.exerciseConfigs?.[exercise.name]?.rom || EXERCISES[exercise.name].rom;
+                    const exerciseUnit = previousSession.exerciseConfigs?.[exercise.name]?.unit || EXERCISES[exercise.name].unit || 'kg';
+                    const barWeight = config.barWeight || 0;
+                    const usesBodyweight = config.usesBodyweight || false;
 
                     let maxWeight = 0;
-                    
+
                     exercise.sets.forEach(set => {
-                        const effectiveWeight = config.usesBodyweight 
-                            ? (parseFloat(set.weight) || 0) + bodyweight 
-                            : (parseFloat(set.weight) || 0);
-                        
-                        const sets = parseFloat(set.sets) || 0;
-                        const reps = parseFloat(set.reps) || 0;
+                        if (set.sets && set.reps && set.weight) {
+                            // Convert weight to kg for calculations
+                            const weightInKg = getWeightInKg(set.weight, exerciseUnit);
 
-                        prevVolume += effectiveWeight * sets * reps;
-                        const force = effectiveWeight * 9.8;
-                        prevWork += force * rom * sets * reps;
+                            // Calculate total weight (including bodyweight or bar if applicable)
+                            const totalWeight = usesBodyweight
+                                ? (weightInKg + bodyweight)
+                                : (weightInKg + barWeight);
 
-                        if (effectiveWeight > maxWeight && reps > 0) {
-                            maxWeight = effectiveWeight;
+                            const sets = parseFloat(set.sets) || 0;
+                            const reps = parseFloat(set.reps) || 0;
+
+                            prevVolume += weightInKg * sets * reps;
+                            const force = totalWeight * 9.8;
+                            prevWork += force * rom * sets * reps;
+
+                            if (totalWeight > maxWeight && reps > 0) {
+                                maxWeight = totalWeight;
+                            }
                         }
                     });
 
                     // Calculate intensity for this exercise
                     if (maxWeight > 0) {
-                        const oneRM = fiveRM > 0 ? fiveRM / (1.0278 - 0.0278 * 5) : 0;
+                        const fiveRMInKg = getWeightInKg(fiveRM, exerciseUnit);
+                        const oneRM = fiveRMInKg > 0 ? fiveRMInKg / (1.0278 - 0.0278 * 5) : 0;
                         const intensity = oneRM > 0 ? (maxWeight / oneRM) * 100 : 0;
                         if (intensity > 0) {
                             prevIntensitySum += intensity;
@@ -888,12 +929,12 @@
                     }
                 });
 
-                const prevWatts = previousSession.workoutTime > 0 
-                    ? prevWork / (previousSession.workoutTime * 60) 
+                const prevWatts = previousSession.workoutTime > 0
+                    ? prevWork / (previousSession.workoutTime * 60)
                     : 0;
 
-                const prevAvgIntensity = prevIntensityCount > 0 
-                    ? prevIntensitySum / prevIntensityCount 
+                const prevAvgIntensity = prevIntensityCount > 0
+                    ? prevIntensitySum / prevIntensityCount
                     : 0;
 
                 document.getElementById('prevVolume').textContent = prevVolume.toFixed(0) + ' kg';
@@ -957,13 +998,14 @@
                         weight: set.weight
                     }));
 
-                    // Copiar configuración (5RM y ROM) de esa sesión específica
+                    // Copiar configuración (5RM, ROM y unit) de esa sesión específica
                     if (lastSessionWithData.exerciseConfigs && lastSessionWithData.exerciseConfigs[currentExercise.name]) {
                         if (!currentSession.exerciseConfigs) currentSession.exerciseConfigs = {};
-                        
+
                         currentSession.exerciseConfigs[currentExercise.name] = {
                             fiveRM: lastSessionWithData.exerciseConfigs[currentExercise.name].fiveRM,
-                            rom: lastSessionWithData.exerciseConfigs[currentExercise.name].rom
+                            rom: lastSessionWithData.exerciseConfigs[currentExercise.name].rom,
+                            unit: lastSessionWithData.exerciseConfigs[currentExercise.name].unit || EXERCISES[currentExercise.name].unit
                         };
                     }
 
