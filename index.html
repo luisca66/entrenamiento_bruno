@@ -50,6 +50,7 @@
             align-items: center;
             margin-top: 15px;
             flex-wrap: wrap;
+            overflow: visible;
         }
 
         @media (max-width: 600px) {
@@ -78,6 +79,12 @@
             font-size: 16px;
             -webkit-appearance: none;
             appearance: none;
+        }
+
+        .date-selector input[type="date"] {
+            pointer-events: auto;
+            position: relative;
+            z-index: 1;
         }
 
         .date-selector input[type="date"]::-webkit-calendar-picker-indicator {
@@ -116,6 +123,9 @@
             background: white;
             color: #667eea;
             border: 2px solid #667eea;
+            position: relative;
+            z-index: 100;
+            pointer-events: auto;
         }
 
         .stats-grid {
