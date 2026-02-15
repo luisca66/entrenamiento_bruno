@@ -549,31 +549,21 @@
 
         // Exercise database with ROM coefficients and 5RM historical values
         const EXERCISES = {
-            // UPPER - Día 1
-            'Press de Banca (Barra)': { rom: 0.4, barWeight: 20, usesBodyweight: false, fiveRM: 90.0, unit: 'kg' },
-            'Remo Sentado con Cable': { rom: 0.36, barWeight: 0, usesBodyweight: false, fiveRM: 140.0, unit: 'lbs' },
-            'Press de Hombros (Mancuerna)': { rom: 0.4, barWeight: 0, usesBodyweight: false, fiveRM: 55.1, unit: 'lbs' },
-            'Jalón al Pecho (Cable)': { rom: 0.5, barWeight: 0, usesBodyweight: false, fiveRM: 149.9, unit: 'lbs' },
-            'Preacher Curl (Barbell)': { rom: 0.3, barWeight: 7, usesBodyweight: false, fiveRM: 33.6, unit: 'kg' },
-            'Tríceps con Polea': { rom: 0.35, barWeight: 0, usesBodyweight: false, fiveRM: 149.9, unit: 'lbs' },
+            // PIERNAS - 3 ejercicios
+            'Sentadilla': { rom: 0.57, barWeight: 20, usesBodyweight: false, fiveRM: 40.0, unit: 'kg' },
+            'Peso Muerto': { rom: 0.46, barWeight: 20, usesBodyweight: false, fiveRM: 95.0, unit: 'kg' },
+            'Pantorrilla': { rom: 0.2, barWeight: 20, usesBodyweight: false, fiveRM: 180.0, unit: 'kg' },
 
-            // LOWER - Día 2
-            'Sentadilla Hack (Máquina)': { rom: 0.57, barWeight: 0, usesBodyweight: false, fiveRM: 40.0, unit: 'kg' },
-            'Peso Muerto Rumano (Barra)': { rom: 0.46, barWeight: 20, usesBodyweight: false, fiveRM: 80.0, unit: 'kg' },
-            'Press de Piernas': { rom: 0.5, barWeight: 0, usesBodyweight: false, fiveRM: 200.0, unit: 'kg' },
-            'Curl de Piernas Acostado (Máquina)': { rom: 0.35, barWeight: 0, usesBodyweight: false, fiveRM: 104.9, unit: 'lbs' },
-            'Elevación de Gemelos de Pie (Máquina)': { rom: 0.2, barWeight: 0, usesBodyweight: false, fiveRM: 224.9, unit: 'lbs' },
+            // ESPALDA - 3 ejercicios
+            'Pull Ups': { rom: 0.5, barWeight: 0, usesBodyweight: true, fiveRM: 0, unit: 'lbs' },
+            'Remo con Barra': { rom: 0.36, barWeight: 12.5, usesBodyweight: false, fiveRM: 117.5, unit: 'kg' },
+            'Shrugs': { rom: 0.15, barWeight: 20, usesBodyweight: false, fiveRM: 0, unit: 'kg' },
 
-            // UPPER - Día 4 (énfasis)
-            'Press de Banca Inclinado (Mancuerna)': { rom: 0.42, barWeight: 0, usesBodyweight: false, fiveRM: 169.8, unit: 'lbs' },
-            'Fondo de Tríceps': { rom: 0.4, barWeight: 0, usesBodyweight: true, fiveRM: 0, unit: 'kg' },
-            'Tirón a la Cara (Face Pull)': { rom: 0.3, barWeight: 0, usesBodyweight: false, fiveRM: 124.6, unit: 'lbs' },
-            'Curl de Bíceps Inclinado (Mancuerna)': { rom: 0.32, barWeight: 0, usesBodyweight: false, fiveRM: 89.9, unit: 'lbs' },
-
-            // LOWER - Día 5 (énfasis)
-            'Peso Muerto (Barra)': { rom: 0.46, barWeight: 20, usesBodyweight: false, fiveRM: 95.0, unit: 'kg' },
-            'Extensión de Pierna': { rom: 0.4, barWeight: 0, usesBodyweight: false, fiveRM: 195.1, unit: 'lbs' },
-            'Rear Kick (Machine)': { rom: 0.35, barWeight: 0, usesBodyweight: false, fiveRM: 94.8, unit: 'lbs' }
+            // PECHO/HOMBROS - 4 ejercicios
+            'Fondos': { rom: 0.4, barWeight: 0, usesBodyweight: true, fiveRM: 0, unit: 'lbs' },
+            'Press Hombro Mancuerna': { rom: 0.4, barWeight: 0, usesBodyweight: false, fiveRM: 55.1, unit: 'lbs' },
+            'Press Inclinado Mancuerna': { rom: 0.42, barWeight: 0, usesBodyweight: false, fiveRM: 169.8, unit: 'lbs' },
+            'Press Horizontal Barra': { rom: 0.4, barWeight: 20, usesBodyweight: false, fiveRM: 90.0, unit: 'kg' }
         };
 
         let currentSession = {
