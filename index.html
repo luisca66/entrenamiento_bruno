@@ -555,7 +555,7 @@
             'Pantorrilla': { rom: 0.2, barWeight: 20, usesBodyweight: false, fiveRM: 180.0, unit: 'kg' },
 
             // ESPALDA - 3 ejercicios
-            'Pull Ups': { rom: 0.5, barWeight: 0, usesBodyweight: true, fiveRM: 0, unit: 'lbs' },
+            'Pull Ups': { rom: 0.5, barWeight: 0, usesBodyweight: true, fiveRM: 0, unit: 'kg' },
             'Remo con Barra': { rom: 0.36, barWeight: 12.5, usesBodyweight: false, fiveRM: 117.5, unit: 'kg' },
             'Shrugs': { rom: 0.15, barWeight: 20, usesBodyweight: false, fiveRM: 0, unit: 'kg' },
 
@@ -641,8 +641,10 @@
                     });
                 }
 
-                // Fondos must always stay in kg, including sessions saved before this correction.
-                currentSession.exerciseConfigs['Fondos'].unit = EXERCISES['Fondos'].unit;
+                // Bodyweight exercises must stay in kg, including sessions saved before this correction.
+                ['Pull Ups', 'Fondos'].forEach(name => {
+                    currentSession.exerciseConfigs[name].unit = EXERCISES[name].unit;
+                });
                 document.getElementById('bodyweight').value = currentSession.bodyweight;
                 document.getElementById('workoutTime').value = currentSession.workoutTime || 60;
             } else {
@@ -791,7 +793,9 @@
             const bodyweight = parseFloat(document.getElementById('bodyweight').value) || 79.2;
             const fiveRM = currentSession.exerciseConfigs[exercise.name]?.fiveRM || EXERCISES[exercise.name].fiveRM;
             const rom = currentSession.exerciseConfigs[exercise.name]?.rom || EXERCISES[exercise.name].rom;
-            const exerciseUnit = currentSession.exerciseConfigs[exercise.name]?.unit || EXERCISES[exercise.name].unit || 'kg';
+            const exerciseUnit = ['Pull Ups', 'Fondos'].includes(exercise.name)
+                ? 'kg'
+                : (currentSession.exerciseConfigs[exercise.name]?.unit || EXERCISES[exercise.name].unit || 'kg');
             const barWeight = config.barWeight || 0;
             const usesBodyweight = config.usesBodyweight || false;
 
@@ -801,21 +805,22 @@
             let maxWeight = 0;
 
             exercise.sets.forEach(set => {
-                if (set.sets && set.reps && set.weight) {
+                const sets = parseFloat(set.sets) || 0;
+                const reps = parseFloat(set.reps) || 0;
+                const weight = parseFloat(set.weight) || 0;
+
+                if (sets > 0 && reps > 0 && (usesBodyweight || weight > 0)) {
                     // Convert weight to kg for calculations
-                    const weightInKg = getWeightInKg(set.weight, exerciseUnit);
+                    const weightInKg = getWeightInKg(weight, exerciseUnit);
 
                     // Calculate total weight (including bodyweight or bar if applicable)
                     const totalWeight = usesBodyweight
                         ? (weightInKg + bodyweight)
                         : (weightInKg + barWeight);
 
-                    const sets = parseFloat(set.sets) || 0;
-                    const reps = parseFloat(set.reps) || 0;
-
                     const setForce = totalWeight * 9.8 * sets * reps;
 
-                    volume += weightInKg * sets * reps;
+                    volume += (usesBodyweight ? totalWeight : weightInKg) * sets * reps;
                     force += setForce;
                     work += setForce * rom;
 
@@ -895,26 +900,29 @@
                     const bodyweight = previousSession.bodyweight || 79.2;
                     const fiveRM = previousSession.exerciseConfigs?.[exercise.name]?.fiveRM || EXERCISES[exercise.name].fiveRM;
                     const rom = previousSession.exerciseConfigs?.[exercise.name]?.rom || EXERCISES[exercise.name].rom;
-                    const exerciseUnit = previousSession.exerciseConfigs?.[exercise.name]?.unit || EXERCISES[exercise.name].unit || 'kg';
+                    const exerciseUnit = ['Pull Ups', 'Fondos'].includes(exercise.name)
+                        ? 'kg'
+                        : (previousSession.exerciseConfigs?.[exercise.name]?.unit || EXERCISES[exercise.name].unit || 'kg');
                     const barWeight = config.barWeight || 0;
                     const usesBodyweight = config.usesBodyweight || false;
 
                     let maxWeight = 0;
 
                     exercise.sets.forEach(set => {
-                        if (set.sets && set.reps && set.weight) {
+                        const sets = parseFloat(set.sets) || 0;
+                        const reps = parseFloat(set.reps) || 0;
+                        const weight = parseFloat(set.weight) || 0;
+
+                        if (sets > 0 && reps > 0 && (usesBodyweight || weight > 0)) {
                             // Convert weight to kg for calculations
-                            const weightInKg = getWeightInKg(set.weight, exerciseUnit);
+                            const weightInKg = getWeightInKg(weight, exerciseUnit);
 
                             // Calculate total weight (including bodyweight or bar if applicable)
                             const totalWeight = usesBodyweight
                                 ? (weightInKg + bodyweight)
                                 : (weightInKg + barWeight);
 
-                            const sets = parseFloat(set.sets) || 0;
-                            const reps = parseFloat(set.reps) || 0;
-
-                            prevVolume += weightInKg * sets * reps;
+                            prevVolume += (usesBodyweight ? totalWeight : weightInKg) * sets * reps;
                             const force = totalWeight * 9.8;
                             prevWork += force * rom * sets * reps;
 
@@ -1012,7 +1020,7 @@
                         currentSession.exerciseConfigs[currentExercise.name] = {
                             fiveRM: lastSessionWithData.exerciseConfigs[currentExercise.name].fiveRM,
                             rom: lastSessionWithData.exerciseConfigs[currentExercise.name].rom,
-                            unit: currentExercise.name === 'Fondos'
+                            unit: ['Pull Ups', 'Fondos'].includes(currentExercise.name)
                                 ? EXERCISES[currentExercise.name].unit
                                 : (lastSessionWithData.exerciseConfigs[currentExercise.name].unit || EXERCISES[currentExercise.name].unit)
                         };
