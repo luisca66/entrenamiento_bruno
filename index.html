@@ -560,7 +560,7 @@
             'Shrugs': { rom: 0.15, barWeight: 20, usesBodyweight: false, fiveRM: 0, unit: 'kg' },
 
             // PECHO/HOMBROS - 4 ejercicios
-            'Fondos': { rom: 0.4, barWeight: 0, usesBodyweight: true, fiveRM: 0, unit: 'lbs' },
+            'Fondos': { rom: 0.4, barWeight: 0, usesBodyweight: true, fiveRM: 0, unit: 'kg' },
             'Press Hombro Mancuerna': { rom: 0.4, barWeight: 0, usesBodyweight: false, fiveRM: 55.1, unit: 'lbs' },
             'Press Inclinado Mancuerna': { rom: 0.42, barWeight: 0, usesBodyweight: false, fiveRM: 169.8, unit: 'lbs' },
             'Press Horizontal Barra': { rom: 0.4, barWeight: 20, usesBodyweight: false, fiveRM: 90.0, unit: 'kg' }
@@ -640,6 +640,9 @@
                         }
                     });
                 }
+
+                // Fondos must always stay in kg, including sessions saved before this correction.
+                currentSession.exerciseConfigs['Fondos'].unit = EXERCISES['Fondos'].unit;
                 document.getElementById('bodyweight').value = currentSession.bodyweight;
                 document.getElementById('workoutTime').value = currentSession.workoutTime || 60;
             } else {
@@ -810,9 +813,11 @@
                     const sets = parseFloat(set.sets) || 0;
                     const reps = parseFloat(set.reps) || 0;
 
+                    const setForce = totalWeight * 9.8 * sets * reps;
+
                     volume += weightInKg * sets * reps;
-                    force += totalWeight * 9.8 * sets * reps;
-                    work += force * rom;
+                    force += setForce;
+                    work += setForce * rom;
 
                     if (totalWeight > maxWeight && reps > 0) {
                         maxWeight = totalWeight;
@@ -1007,7 +1012,9 @@
                         currentSession.exerciseConfigs[currentExercise.name] = {
                             fiveRM: lastSessionWithData.exerciseConfigs[currentExercise.name].fiveRM,
                             rom: lastSessionWithData.exerciseConfigs[currentExercise.name].rom,
-                            unit: lastSessionWithData.exerciseConfigs[currentExercise.name].unit || EXERCISES[currentExercise.name].unit
+                            unit: currentExercise.name === 'Fondos'
+                                ? EXERCISES[currentExercise.name].unit
+                                : (lastSessionWithData.exerciseConfigs[currentExercise.name].unit || EXERCISES[currentExercise.name].unit)
                         };
                     }
 
