@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Entrena Bruno">
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="manifest.json?v=5">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -116,5 +116,5 @@ function exportData(){const blob=new Blob([JSON.stringify(sessions(),null,2)],{t
 importFile.addEventListener('change',e=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const data=JSON.parse(reader.result);if(!Array.isArray(data))throw Error();localStorage.setItem(STORAGE_KEY,JSON.stringify(data));load(currentSession.date);toast('Datos importados')}catch{toast('El archivo no contiene datos válidos')}};reader.readAsText(file);e.target.value=''})
 function toast(message){const el=document.getElementById('toast');el.textContent=message;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),2200)}
 timer.duration=Number(localStorage.getItem('workoutRestBruno'))||90;setInterval(()=>save(false),30000);load();
-if('serviceWorker'in navigator)window.addEventListener('load',async()=>{let refreshing=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(refreshing)return;refreshing=true;window.location.reload()});try{const registration=await navigator.serviceWorker.register('./sw.js?v=4');await registration.update()}catch{}});
+if('serviceWorker'in navigator)window.addEventListener('load',async()=>{let refreshing=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(refreshing)return;refreshing=true;window.location.reload()});try{const registration=await navigator.serviceWorker.register('./sw.js?v=5');await registration.update()}catch{}});
 </script></body></html>
